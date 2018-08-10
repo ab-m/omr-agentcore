@@ -43,8 +43,21 @@
     ],
     "conditions": [
       ['OS=="aix"', {
-        "defines": [ "_AIX", "AIX" ],
-        "libraries": [ "-Wl,-bexpall,-brtllib,-G,-bernotok,-brtl,-L.,-bnoipath" ],
+        'variables': {
+            'os_name': '<!(uname -s)',
+          },
+          'conditions': [
+             [ '"<(os_name)"=="AIX"', {
+              "defines": [ "_AIX", "AIX" ],
+              "libraries": [ "-Wl,-bexpall,-brtllib,-G,-bernotok,-brtl,-L.,-bnoipath" ]
+             }],
+             [ '"<(os_name)"=="OS400"', {
+              'ldflags': [
+                '-Wl,-brtl,-bnoquiet,-bnoipath'
+              ],
+              "defines": [ "__PASE__", "PASE" ]
+            }]
+          ]
       }],
       ['OS=="mac"', {
         "defines": [ "__MACH__", "__APPLE__",  ],
@@ -164,8 +177,18 @@
           "libraries": [ "Pdh" ],
         }],
         ['OS=="aix"', {
-          "libraries": [ "-lperfstat" ],
-        }],
+          'variables': {
+            'os_name': '<!(uname -s)',
+          },
+          'conditions': [
+            [ '"<(os_name)"=="AIX"', {
+              "libraries": [ "-lperfstat" ]
+            }],
+            [ '"<(os_name)"=="OS400"', {
+              #find alternative to libperfstat
+            }]
+          ]
+        }]
       ],
     },
     {
