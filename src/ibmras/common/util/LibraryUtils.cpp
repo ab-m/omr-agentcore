@@ -85,6 +85,7 @@ std::string LibraryUtils::getLibraryLocation(const void* func) {
 #if defined (WINDOWS)
 #elif defined(AIX)
 #elif defined(_ZOS)
+#elif defined(__PASE__)
 #else
 	Dl_info dlInfo;
 	int rc = dladdr(func, &dlInfo);
