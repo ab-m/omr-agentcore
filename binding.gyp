@@ -55,7 +55,7 @@
               'ldflags': [
                 '-Wl,-brtl,-bnoquiet,-bnoipath'
               ],
-              "defines": [ "__PASE__", "PASE" ]
+              "defines": [ "__PASE__", "PASE", "AIXPPC" ]
             }]
           ]
       }],

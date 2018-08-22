@@ -59,7 +59,7 @@
 #pragma comment(lib, "psapi.lib")
 #endif
 
-#if defined(AIXPPC) || defined(__PASE__)
+#if defined(AIXPPC)
 #include <unistd.h>
 #include <alloca.h>
 #include <procinfo.h>
@@ -315,7 +315,7 @@ int64 MemoryPlugin::getProcessPhysicalMemorySize() {
 	size_t size = t_info.resident_size;
 	return size;
 
-#elif defined(AIXPPC) || defined(__PASE__)
+#elif defined(AIXPPC)
         /*
          * There is no API on AIX to get the rss of the shared memory used by this process.
          * If such an API was available, this function should return the following:
@@ -367,7 +367,7 @@ int64 MemoryPlugin::getProcessPrivateMemorySize() {
                 }
         }
 #undef SHARED_FIELD_INDEX
-#elif defined(AIXPPC) || defined(__PASE__)
+#elif defined(AIXPPC)
         struct procentry64 pe;
         pid_t pid = getpid();
 
@@ -416,7 +416,7 @@ int64  MemoryPlugin::getProcessVirtualMemorySize() {
 	task_info(current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
 	size_t size = t_info.virtual_size;
 	return size;
-#elif defined(AIXPPC) || defined(__PASE__)
+#elif defined(AIXPPC)
         /* There is no API on AIX to get shared memory usage for the process. If such an
          * API existed, we could return getProcessPrivateMemorySize() + sharedSize here.
          *
@@ -458,7 +458,11 @@ int64 MemoryPlugin::getFreePhysicalMemorySize() {
         	return -1;
         }
         return vm_stat.free_count*pageSize;
-
+#elif defined (__PASE__)
+        //TODO: Working on PASE Implementation
+        //AIXPPC implementation fails on PASE ...
+        // ...@ line 487 size never gets changed therefore -1 is returned 
+        return -1;
 #elif defined(AIXPPC)
         /* NOTE: This works on AIX 5.3 and later. */
         IDATA numPageSizes = vmgetinfo(NULL, VMINFO_GETPSIZES, 0);
@@ -495,11 +499,6 @@ int64 MemoryPlugin::getFreePhysicalMemorySize() {
         {
                 return statex.ullAvailPhys;
         }
-        return -1;
-#elif defined (__PASE__)
-        //TODO: Working on PASE Implementation
-        //AIXPPC implementation fails on PASE ...
-        // ...@ line 482 size never gets changed therefore -1 is returned 
         return -1;
 #else
         return -1;
